@@ -3,17 +3,8 @@ const verifyToken = require("../middleware/verify-token.js");
 const Entry = require("../models/entry.js");
 const router = express.Router();
 
-router.post("/", verifyToken, async (req, res) => {
-  try {
-    req.body.author = req.user._id;
-    const entry = await Entry.create(req.body);
-    entry._doc.author = req.user;
-    res.status(201).json(entry);
-  } catch (err) {
-    res.status(500).json({ err: err.message });
-  }
-});
-
+//GET
+//get all entries
 router.get("/", verifyToken, async (req, res) => {
   try {
     const entries = await Hoot.find({})
@@ -25,6 +16,7 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
+//get specific entry
 router.get("/:entryId", verifyToken, async (req, res) => {
   try {
     // populate author of entry and reflections
@@ -37,5 +29,24 @@ router.get("/:entryId", verifyToken, async (req, res) => {
     res.status(500).json({ err: err.message });
   }
 });
+
+//POST
+//Create new entry
+router.post("/", verifyToken, async (req, res) => {
+  try {
+    req.body.author = req.user._id;
+    const entry = await Entry.create(req.body);
+    entry._doc.author = req.user;
+    res.status(201).json(entry);
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+});
+
+//PUT
+//update a specific entry
+
+//DELETE
+//delete a specific entry
 
 module.exports = router;
