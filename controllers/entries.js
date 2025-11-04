@@ -60,5 +60,9 @@ if (!entry) {
   }
 });
 
+if (entry.author.toString() !== req.user._id.toString()) {
+  return res.status(403).json({ error: "Unauthorized action" });
+}
+
 
 module.exports = router;
