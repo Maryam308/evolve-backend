@@ -49,20 +49,23 @@ router.post("/", verifyToken, async (req, res) => {
 //DELETE
 //delete a specific entry
 router.delete("/:entryId", verifyToken, async (req, res) => {
-  try {const entry = await Entry.findById(req.params.entryId);
+  try {
+    const entry = await Entry.findById(req.params.entryId);
 
-if (!entry) {
-  return res.status(404).json({ error: "Entry not found" });
-}
+    if (!entry) {
+      return res.status(404).json({ error: "Entry not found" });
+    }
 
-} catch (err) {
+    if (entry.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "Unauthorized action" });
+    }
+
+    await Entry.findByIdAndDelete(req.params.entryId);
+    res.status(200).json({ message: "Entry deleted successfully" });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
-if (entry.author.toString() !== req.user._id.toString()) {
-  return res.status(403).json({ error: "Unauthorized action" });
-}
 
 
 module.exports = router;
