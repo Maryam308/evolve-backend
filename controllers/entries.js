@@ -49,7 +49,12 @@ router.post("/", verifyToken, async (req, res) => {
 //DELETE
 //delete a specific entry
 router.delete("/:entryId", verifyToken, async (req, res) => {
-  try {
+  try {const entry = await Entry.findById(req.params.entryId);
+
+if (!entry) {
+  return res.status(404).json({ error: "Entry not found" });
+}
+
 } catch (err) {
     res.status(500).json({ error: err.message });
   }
