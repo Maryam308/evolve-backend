@@ -48,6 +48,12 @@ router.post("/", verifyToken, async (req, res) => {
 
 //DELETE
 //delete a specific entry
-// Step 1: Preparing delete route setup
+router.delete("/:entryId", verifyToken, async (req, res) => {
+  try {
+} catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 module.exports = router;
