@@ -7,7 +7,7 @@ const router = express.Router();
 //get all entries
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const entries = await Hoot.find({})
+    const entries = await Entry.find({})
       .populate("author")
       .sort({ createdAt: "desc" });
     res.status(200).json(entries);
@@ -66,6 +66,5 @@ router.delete("/:entryId", verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 module.exports = router;
