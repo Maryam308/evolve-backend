@@ -78,7 +78,4 @@ const entrySchema = new mongoose.Schema(
 
 const Entry = mongoose.model("Entry", entrySchema);
 
-module.exports = {
-  Entry,
-  Reflection,
-};
+module.exports = Entry;
