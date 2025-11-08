@@ -1,6 +1,6 @@
 const express = require("express");
 const verifyToken = require("../middleware/verify-token.js");
-const Entry = require("../models/entry.js");
+const { Entry, Reflection } = require("../models/entry.js");
 const router = express.Router();
 
 // GET all entries
@@ -35,6 +35,32 @@ router.post("/", verifyToken, async (req, res) => {
     const entry = await Entry.create(req.body);
     entry._doc.author = req.user;
     res.status(201).json(entry);
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+});
+
+// POST create reflection on an entry
+router.post("/:entryId/reflections", verifyToken, async (req, res) => {
+  try {
+    // Create the reflection document
+    const reflection = await Reflection.create({
+      reflectionText: req.body.reflectionText,
+      entry: req.params.entryId,
+    });
+
+    // Add the reflection reference to the entry
+    const entry = await Entry.findById(req.params.entryId);
+    entry.reflections.push(reflection._id);
+    await entry.save();
+
+    // Return the updated entry with populated data
+    const updatedEntry = await Entry.findById(req.params.entryId).populate([
+      "author",
+      "reflections",
+    ]);
+
+    res.status(201).json(updatedEntry);
   } catch (err) {
     res.status(500).json({ err: err.message });
   }
