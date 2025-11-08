@@ -1,10 +1,9 @@
 const express = require("express");
 const verifyToken = require("../middleware/verify-token.js");
-const Entry = require("../models/entry.js");
+const { Entry, Reflection } = require("../models/entry.js");
 const router = express.Router();
 
-//GET
-//get all entries
+// GET all entries
 router.get("/", verifyToken, async (req, res) => {
   try {
     const entries = await Entry.find({})
@@ -16,10 +15,9 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-//get specific entry
+// GET specific entry
 router.get("/:entryId", verifyToken, async (req, res) => {
   try {
-    // populate author of entry and reflections
     const entry = await Entry.findById(req.params.entryId).populate([
       "author",
       "reflections.author",
@@ -30,8 +28,7 @@ router.get("/:entryId", verifyToken, async (req, res) => {
   }
 });
 
-//POST
-//Create new entry
+// POST create new entry
 router.post("/", verifyToken, async (req, res) => {
   try {
     req.body.author = req.user._id;
@@ -42,6 +39,7 @@ router.post("/", verifyToken, async (req, res) => {
     res.status(500).json({ err: err.message });
   }
 });
+
 
 //PUT
 //update a specific entry
@@ -69,8 +67,8 @@ router.put("/:entryId", verifyToken, async (req, res) => {
   }
 });
 
-//DELETE
-//delete a specific entry
+
+// DELETE a specific entry along with its reflections
 router.delete("/:entryId", verifyToken, async (req, res) => {
   try {
     const entry = await Entry.findById(req.params.entryId);
@@ -83,8 +81,10 @@ router.delete("/:entryId", verifyToken, async (req, res) => {
       return res.status(403).json({ error: "Unauthorized action" });
     }
 
+    await Reflection.deleteMany({ entry: entry._id });
     await Entry.findByIdAndDelete(req.params.entryId);
-    res.status(200).json({ message: "Entry deleted successfully" });
+
+    res.status(200).json({ message: "Entry and related reflections deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
