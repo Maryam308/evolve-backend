@@ -104,6 +104,11 @@ router.delete("/:entryId", verifyToken, async (req, res) => {
     if (entry.author.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: "Unauthorized action" });
     }
+// controllers/hoots.js
+
+if (!entry.author._id.equals(req.user._id)) {
+  return res.status(403).send("You're not allowed to do that!");
+}
 
     await Reflection.deleteMany({ entry: entry._id });
     await Entry.findByIdAndDelete(req.params.entryId);
@@ -115,5 +120,8 @@ router.delete("/:entryId", verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
 
 module.exports = router;
