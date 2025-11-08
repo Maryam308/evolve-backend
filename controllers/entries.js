@@ -1,6 +1,6 @@
 const express = require("express");
 const verifyToken = require("../middleware/verify-token.js");
-const { Entry, Reflection } = require("../models/entry.js");
+const Entry = require("../models/entry.js");
 const router = express.Router();
 
 // GET all entries
@@ -40,7 +40,6 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-
 //PUT
 //update a specific entry
 router.put("/:entryId", verifyToken, async (req, res) => {
@@ -67,7 +66,6 @@ router.put("/:entryId", verifyToken, async (req, res) => {
   }
 });
 
-
 // DELETE a specific entry along with its reflections
 router.delete("/:entryId", verifyToken, async (req, res) => {
   try {
@@ -84,7 +82,9 @@ router.delete("/:entryId", verifyToken, async (req, res) => {
     await Reflection.deleteMany({ entry: entry._id });
     await Entry.findByIdAndDelete(req.params.entryId);
 
-    res.status(200).json({ message: "Entry and related reflections deleted successfully" });
+    res
+      .status(200)
+      .json({ message: "Entry and related reflections deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
