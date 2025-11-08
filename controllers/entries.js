@@ -45,6 +45,29 @@ router.post("/", verifyToken, async (req, res) => {
 
 //PUT
 //update a specific entry
+router.put("/:entryId", verifyToken, async (req, res) => {
+  try {
+    const entry = await Entry.findById(req.params.entryId);
+
+    if (!entry) {
+      return res.status(404).json({ error: "Entry not found" });
+    }
+
+    if (entry.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "Unauthorized action" });
+    }
+
+    const updatedEntry = await Entry.findByIdAndUpdate(
+      req.params.entryId,
+      req.body,
+      { new: true }
+    ).populate("author");
+
+    res.status(200).json(updatedEntry);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 //DELETE
 //delete a specific entry
