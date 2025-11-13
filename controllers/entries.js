@@ -43,18 +43,15 @@ router.post("/", verifyToken, async (req, res) => {
 // POST create reflection on an entry
 router.post("/:entryId/reflections", verifyToken, async (req, res) => {
   try {
-    // Create the reflection document
     const reflection = await Reflection.create({
       reflectionText: req.body.reflectionText,
       entry: req.params.entryId,
     });
 
-    // Add the reflection reference to the entry
     const entry = await Entry.findById(req.params.entryId);
     entry.reflections.push(reflection._id);
     await entry.save();
 
-    // Return the updated entry with populated data
     const updatedEntry = await Entry.findById(req.params.entryId).populate([
       "author",
       "reflections",
@@ -66,18 +63,13 @@ router.post("/:entryId/reflections", verifyToken, async (req, res) => {
   }
 });
 
-//PUT
-//update a specific entry
+// PUT - update a specific entry
 router.put("/:entryId", verifyToken, async (req, res) => {
   try {
     const entry = await Entry.findById(req.params.entryId);
 
     if (!entry) {
       return res.status(404).json({ error: "Entry not found" });
-    }
-
-    if (entry.author.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: "Unauthorized action" });
     }
 
     const updatedEntry = await Entry.findByIdAndUpdate(
@@ -101,15 +93,6 @@ router.delete("/:entryId", verifyToken, async (req, res) => {
       return res.status(404).json({ error: "Entry not found" });
     }
 
-    if (entry.author.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: "Unauthorized action" });
-    }
-// controllers/hoots.js
-
-if (!entry.author._id.equals(req.user._id)) {
-  return res.status(403).send("You're not allowed to do that!");
-}
-
     await Reflection.deleteMany({ entry: entry._id });
     await Entry.findByIdAndDelete(req.params.entryId);
 
@@ -120,8 +103,5 @@ if (!entry.author._id.equals(req.user._id)) {
     res.status(500).json({ error: err.message });
   }
 });
-
-
-
 
 module.exports = router;
