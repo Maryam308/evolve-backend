@@ -56,13 +56,11 @@ router.post("/", verifyToken, async (req, res) => {
 // POST create reflection on an entry
 router.post("/:entryId/reflections", verifyToken, async (req, res) => {
   try {
-    // Create the reflection document
     const reflection = await Reflection.create({
       reflectionText: req.body.reflectionText,
       entry: req.params.entryId,
     });
 
-    // Add the reflection reference to the entry
     const entry = await Entry.findById(req.params.entryId);
     entry.reflections.push(reflection._id);
     await entry.save();
