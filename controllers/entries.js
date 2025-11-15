@@ -93,6 +93,10 @@ router.delete("/:entryId", verifyToken, async (req, res) => {
       return res.status(404).json({ error: "Entry not found" });
     }
 
+    if (entry.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "Unauthorized action" });
+    }
+
     await Reflection.deleteMany({ entry: entry._id });
     await Entry.findByIdAndDelete(req.params.entryId);
 
