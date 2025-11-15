@@ -16,9 +16,7 @@ const entriesRouter = require("./controllers/entries.js");
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI);
 
-mongoose.connection.on("connected", () => {
-  console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
-});
+mongoose.connection.on("connected", () => {});
 
 // Middleware
 app.use(cors());
@@ -31,7 +29,5 @@ app.use("/test-jwt", testJwtRouter);
 app.use("/users", usersRouter);
 app.use("/entries", entriesRouter);
 
-// Start the server and listen on port 3000
-app.listen(PORT, () => {
-  console.log("The express app is ready!");
-});
+// Start the server
+app.listen(PORT, () => {});
