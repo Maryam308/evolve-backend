@@ -6,7 +6,7 @@ const router = express.Router();
 // GET all entries
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const entries = await Entry.find({})
+    const entries = await Entry.find({ author: req.user._id })
       .populate("author")
       .sort({ createdAt: "desc" });
     res.status(200).json(entries);
