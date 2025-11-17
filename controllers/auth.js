@@ -11,7 +11,9 @@ router.post("/sign-up", async (req, res) => {
     const userInDatabase = await User.findOne({ username: req.body.username });
 
     if (userInDatabase) {
-      return res.status(409).json({ err: "Username already taken." });
+      return res.status(409).json({
+        err: "Invalid username or password, try again please",
+      });
     }
 
     const user = await User.create({
