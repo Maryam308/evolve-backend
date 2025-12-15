@@ -1,24 +1,34 @@
+// server.js
 const dotenv = require("dotenv");
 dotenv.config();
 
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const logger = require("morgan");
+const authRoutes = require("./controllers/auth");
+const usersRoutes = require("./controllers/users");
+const activitiesRoutes = require("./controllers/entries");
+const goalsRoutes = require("./controllers/goals");
+const challengesRoutes = require("./controllers/challenges");
+const { verifyToken } = require("./middleware/auth");
 
-const PORT = process.env.PORT || 5000;
+const app = express();
 
-// Import routers
-const authRouter = require("./controllers/auth");
-const usersRouter = require("./controllers/users");
-const activitiesRouter = require("./controllers/activities"); // بدل entries
+// Port
+const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI);
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 mongoose.connection.on("connected", () => {
-  console.log("MongoDB connected");
+  console.log("✅ Connected to MongoDB");
+});
+mongoose.connection.on("error", (err) => {
+  console.error("❌ MongoDB connection error:", err);
 });
 
 // Middleware
@@ -27,16 +37,18 @@ app.use(express.json());
 app.use(logger("dev"));
 
 // Routes
-app.use("/api/auth", authRouter);
-app.use("/api/users", usersRouter);
-app.use("/api/activities", activitiesRouter);
+app.use("/auth", authRoutes); // login, signup
+app.use("/users", verifyToken, usersRoutes); // protected
+app.use("/activities", verifyToken, activitiesRoutes); // protected CRUD
+app.use("/goals", verifyToken, goalsRoutes); // protected CRUD
+app.use("/challenges", verifyToken, challengesRoutes); // protected CRUD
 
-// Test route
+// Default route
 app.get("/", (req, res) => {
-  res.send("TimeBank API running");
+  res.send("Welcome to TimeBank+ API!");
 });
 
-// Start the server
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
